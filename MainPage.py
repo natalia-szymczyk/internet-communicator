@@ -263,7 +263,10 @@ class Ui_MainWindow(object):
         self.gaduGaduLabel.setText("Gadu Gadu")
         self.yourFriendsLabel.setText("Your friends:")
         self.helloLabel.setText(_translate("MainWindow", f"Hello {self.currentUser.name}! "))
-        self.descriptionEdit.setText(_translate("MainWindow", self.currentUser.description))
+        if len(self.currentUser.description) == 0:
+            self.descriptionEdit.setPlaceholderText("My description...")
+        else:
+            self.descriptionEdit.setText(self.currentUser.description)
         self.addFriendButton.setText("Add a friend")
         self.logOutButton.setText("Log out")
         self.descriptionButton.setText("Change")

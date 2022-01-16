@@ -224,14 +224,14 @@ class Ui_LoginPage(object):
         _translate = QtCore.QCoreApplication.translate
         LoginPage.setWindowTitle(_translate("LoginPage", "Gadu Gadu"))
         self.label1.setText("Need an account?")
-        self.loginInputUp.setText("Login")
-        self.passwordInputUp.setText("Password")
+        self.loginInputUp.setPlaceholderText("Login")
+        self.passwordInputUp.setPlaceholderText("Password")
         self.signUpButton.setText("Sign up")
         self.label2.setText("Already a user?")
-        self.loginInputIn.setText("Login")
+        self.loginInputIn.setPlaceholderText("Login")
+        self.passwordInputIn.setPlaceholderText("Password")
+        self.nameInputUp.setPlaceholderText("Name")
         self.signInButton.setText("Sign in")
-        self.passwordInputIn.setText("Password")
-        self.nameInputUp.setText("Name")
         self.signInButton.setShortcut("Return")
 
 

@@ -102,7 +102,7 @@ class Ui_SearchFriend(object):
         _translate = QtCore.QCoreApplication.translate
         SearchFriend.setWindowTitle(_translate("SearchFriend", "Search a friend"))
         self.searchButton.setText("OK")
-        self.friendsLogin.setText("Login")
+        self.friendsLogin.setPlaceholderText("Login")
         self.label.setText("Search a friend:")
 
         self.searchButton.setShortcut("Return")
