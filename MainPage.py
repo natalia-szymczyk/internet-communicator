@@ -2,6 +2,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import sys
 
+from SearchFriend import Ui_SearchFriend
+from ChatWindow import Window
+
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -11,11 +17,11 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(0, 0, 621, 61))
+        self.gaduGaduLabel = QtWidgets.QLabel(self.centralwidget)
+        self.gaduGaduLabel.setGeometry(QtCore.QRect(0, 0, 621, 61))
 
         palette = self.getPalette()
-        self.label.setPalette(palette)
+        self.gaduGaduLabel.setPalette(palette)
 
         font = QtGui.QFont()
         font.setFamily("Jokerman")
@@ -23,12 +29,12 @@ class Ui_MainWindow(object):
         font.setBold(False)
         font.setWeight(50)
 
-        self.label.setFont(font)
-        self.label.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.gaduGaduLabel.setFont(font)
+        self.gaduGaduLabel.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.gaduGaduLabel.setAlignment(QtCore.Qt.AlignCenter)
 
         self.addFriendButton = QtWidgets.QPushButton(self.centralwidget)
-        self.addFriendButton.setGeometry(QtCore.QRect(450, 80, 171, 61))
+        self.addFriendButton.setGeometry(QtCore.QRect(450, 150, 171, 61))
 
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -46,7 +52,7 @@ class Ui_MainWindow(object):
         self.logOutButton.setFont(font)
 
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
-        self.listWidget.setGeometry(QtCore.QRect(0, 160, 621, 341))
+        self.listWidget.setGeometry(QtCore.QRect(0, 220, 621, 281))
 
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -64,8 +70,8 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.listWidget.addItem(item)
 
-        self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 120, 171, 41))
+        self.yourFriendsLabel = QtWidgets.QLabel(self.centralwidget)
+        self.yourFriendsLabel.setGeometry(QtCore.QRect(0, 170, 171, 41))
 
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -74,13 +80,32 @@ class Ui_MainWindow(object):
         font.setItalic(True)
         font.setWeight(75)
 
-        self.label_2.setFont(font)
+        self.yourFriendsLabel.setFont(font)
+
+        self.helloLabel = QtWidgets.QLabel(self.centralwidget)
+        self.helloLabel.setGeometry(QtCore.QRect(10, 80, 131, 31))
+
+        font.setPointSize(14)
+
+        self.helloLabel.setFont(font)
+
+        self.descriptionEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.descriptionEdit.setGeometry(QtCore.QRect(0, 111, 621, 31))
+
+        font = QtGui.QFont()
+        font.setFamily("Imprint MT Shadow")
+        font.setPointSize(10)
+
+        self.descriptionEdit.setFont(font)
+        self.descriptionEdit.setAlignment(QtCore.Qt.AlignCenter)
 
         MainWindow.setCentralWidget(self.centralwidget)
+
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 622, 26))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+        
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -88,19 +113,39 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.listWidget.itemDoubleClicked.connect(self.getItem)
+        self.listWidget.itemDoubleClicked.connect(self.openChat)
 
         self.addFriendButton.clicked.connect(self.addFriend)
 
         self.logOutButton.clicked.connect(self.askBeforeLogOut)
 
-    def getItem(self, friendLogin):
+        self.chatWindows = []
+
+
+    def openChat(self, friendLogin):
         print(friendLogin.text())
         # TODO wyskakuje okienko z chatem
+        self.openChatWindow(friendLogin.text())
+        
+
+    def openChatWindow(self, user):
+        window = Window(user)
+        window.exec()
+        self.chatWindows.append(window)
+
 
     def addFriend(self):
         print("add friend")
-        # TODO wyskakuje okienko z dodawaniem znajomych
+        # TODO szukanie znajomych po loginie
+        self.openSearchFriend()
+
+
+    def openSearchFriend(self):
+        self.window = QtWidgets.QMainWindow()   
+        self.ui = Ui_SearchFriend()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        
 
     def askBeforeLogOut(self):
         msg = QMessageBox()
@@ -115,15 +160,14 @@ class Ui_MainWindow(object):
 
         x = msg.exec_()
 
+
     def popup_button(self, i):
         if i.text() == "&Yes":
             self.LogOut()
-        else:
-            pass
+
 
     def LogOut(self):
-        print("log out")
-        # TODO log out - powrot to panelu logowania, wyczyszczenie danych
+        QtWidgets.qApp.quit()
 
 
     def getPalette(self):
@@ -167,11 +211,14 @@ class Ui_MainWindow(object):
 
         return palette
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Gadu Gadu"))
-        self.label.setText("Gadu Gadu")
-        self.label_2.setText("Your friends:")
+        self.gaduGaduLabel.setText("Gadu Gadu")
+        self.yourFriendsLabel.setText("Your friends:")
+        self.helloLabel.setText(_translate("MainWindow", "Hello {login}! "))
+        self.descriptionEdit.setText(_translate("MainWindow", "My description"))
         self.addFriendButton.setText("Add a friend")
         self.logOutButton.setText("Log out")
 
@@ -190,10 +237,13 @@ class Ui_MainWindow(object):
         self.listWidget.setSortingEnabled(__sortingEnabled)
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+def main():
+
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()

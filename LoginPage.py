@@ -1,8 +1,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
+from MainPage import Ui_MainWindow
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QAction
+
+
+app = QtWidgets.QApplication(sys.argv)
+LoginPage = QtWidgets.QMainWindow()
 
 
 class Ui_LoginPage(object):
+
     def setupUi(self, LoginPage):
         LoginPage.setObjectName("LoginPage")
         LoginPage.resize(342, 466)
@@ -89,6 +97,7 @@ class Ui_LoginPage(object):
         font.setPointSize(10)
         self.errorLabel.setFont(font)
         self.errorLabel.setText("")
+        self.errorLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.errorLabel.setObjectName("errorLabel")
 
         LoginPage.setCentralWidget(self.centralwidget)
@@ -104,29 +113,11 @@ class Ui_LoginPage(object):
         self.retranslateUi(LoginPage)
         QtCore.QMetaObject.connectSlotsByName(LoginPage)
 
+
         self.signInButton.clicked.connect(self.signInCheck)
 
         self.signUpButton.clicked.connect(self.signUpCheck)
 
-
-    def signUpCheck(self):
-        print("check sign up " + " name: " + self.nameInputUp.text() + " login: " + self.loginInputUp.text() + " password: " + self.passwordInputUp.text())
-
-        if self.passwordCheck(self.passwordInputUp.text()) and self.loginCheck(self.loginInputUp.text()):
-            self.signUp()
-        # else:
-        #     self.errorLabel.setText("Wrong data")
-
-
-    def passwordCheck(self, password):
-        if len(password) < 5:
-            self.errorLabel.setText("Password too short")
-            return False
-        elif len(password) > 20:
-            self.errorLabel.setText("Password too long.")
-            return False
-        
-        return True
 
     def loginCheck(self, login):
         if len(login) < 5:
@@ -146,10 +137,37 @@ class Ui_LoginPage(object):
         return True
 
 
-    def signUp(self):
-        print("ok to sign up")
-        # TODO rejstracja uzytkownika
+    def passwordCheck(self, password):
+        if len(password) < 5:
+            self.errorLabel.setText("Password too short")
+            return False
+        elif len(password) > 20:
+            self.errorLabel.setText("Password too long.")
+            return False
+        
+        return True
 
+
+    def signUpCheck(self):
+        print("check sign up " + " name: " + self.nameInputUp.text() + " login: " + self.loginInputUp.text() + " password: " + self.passwordInputUp.text())
+
+        if self.passwordCheck(self.passwordInputUp.text()) and self.loginCheck(self.loginInputUp.text()):
+            self.signUp()
+
+
+    def signUp(self):
+        print("Successfully registered")
+        # TODO rejstracja uzytkownika
+        self.openMainPage()
+
+
+    def openMainPage(self):
+        self.window = QtWidgets.QMainWindow()   
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        LoginPage.hide()
+        
 
     def signInCheck(self):
         print("checking sign in" + " login: " + self.loginInputIn.text() + " password: " + self.passwordInputIn.text())
@@ -166,6 +184,7 @@ class Ui_LoginPage(object):
     def signIn(self):
         print("ok to sign in")
         # TODO logowanie
+        self.openMainPage()
 
 
     def retranslateUi(self, LoginPage):
@@ -182,12 +201,17 @@ class Ui_LoginPage(object):
         self.nameInputUp.setText("Name")
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-
-    LoginPage = QtWidgets.QMainWindow()
+def main():
+    # app = QtWidgets.QApplication(sys.argv)
+    # LoginPage = QtWidgets.QMainWindow()    
     ui = Ui_LoginPage()
     ui.setupUi(LoginPage)
     LoginPage.show()
 
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()
+
+

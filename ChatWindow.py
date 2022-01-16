@@ -4,7 +4,7 @@ import sys
 
 
 class Window(QDialog):
-    def __init__(self):
+    def __init__(self, user):
         super().__init__()
 
         self.message = QLineEdit(self)
@@ -36,7 +36,7 @@ class Window(QDialog):
 
         self.chat_body.addWidget(splitter2)
 
-        self.setWindowTitle("Login uzytkownika (opis uzytkownika)")
+        self.setWindowTitle(user + " (jakis opis)")
         self.resize(500, 500)
 
     def send(self):
@@ -62,6 +62,7 @@ class Window(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window()
+    user = "login"
+    window = Window(user)
     window.exec()
     sys.exit(app.exec_())
