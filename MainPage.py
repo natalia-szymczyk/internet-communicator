@@ -53,6 +53,10 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         self.logOutButton.setFont(font)
 
+        self.refreshButton = QtWidgets.QPushButton(self.centralwidget)
+        self.refreshButton.setGeometry(QtCore.QRect(10, 510, 93, 28))
+        self.refreshButton.setFont(font)
+
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
         self.listWidget.setGeometry(QtCore.QRect(0, 220, 621, 281))
 
@@ -118,6 +122,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.chatWindows = []
+        oldFriends = len(self.currentUser.friends)
+
         self.listWidget.itemDoubleClicked.connect(self.openChat)
 
         self.addFriendButton.clicked.connect(self.addFriend)
@@ -126,7 +133,8 @@ class Ui_MainWindow(object):
 
         self.descriptionButton.clicked.connect(self.changeDescription)
 
-        self.chatWindows = []
+        self.refreshButton.clicked.connect(lambda: self.updateFriendsList(oldFriends))
+
 
     def changeDescription(self):
         description = self.descriptionEdit.text()
@@ -155,24 +163,10 @@ class Ui_MainWindow(object):
 
 
     def openSearchFriend(self):
-        # before = self.currentUser.friends
-        # print(f"before {before}")
-
         self.window = QtWidgets.QMainWindow()   
         self.ui = Ui_SearchFriend()
         self.ui.setupUi(self.window, self.currentUser)
         self.window.show()
-
-        # TODO update friends list ??
-
-        # after = self.currentUser.friends
-        # print(f"after {after}")
-
-        # print(f"bool:  {self.ui.friendAdded}")
-
-        # if before != after:
-        #     self.updateFriendsList()
-
         
 
     def askBeforeLogOut(self):
@@ -240,6 +234,29 @@ class Ui_MainWindow(object):
         return palette
 
 
+    def updateFriendsList(self, oldFriends):
+        __sortingEnabled = self.listWidget.isSortingEnabled()
+        self.listWidget.setSortingEnabled(False)
+
+        newFriends = len(self.currentUser.friends) - oldFriends
+
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(14)
+        
+        for i in range(newFriends):
+            item = QtWidgets.QListWidgetItem()
+            item.setFont(font)
+            self.listWidget.addItem(item)
+
+        for i in range(len(self.currentUser.friends)):
+            item = self.listWidget.item(i)
+            friend = getUser(self.currentUser.friends[i])
+            item.setText(friend.toString())
+
+        self.listWidget.setSortingEnabled(__sortingEnabled)
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Gadu Gadu"))
@@ -250,21 +267,9 @@ class Ui_MainWindow(object):
         self.addFriendButton.setText("Add a friend")
         self.logOutButton.setText("Log out")
         self.descriptionButton.setText("Change")
+        self.refreshButton.setText("Refresh")
 
-        self.updateFriendsList()
-
-    def updateFriendsList(self):
-        __sortingEnabled = self.listWidget.isSortingEnabled()
-        self.listWidget.setSortingEnabled(False)
-
-        for i in range(len(self.currentUser.friends)):
-            print(self.currentUser.friends[i])
-
-            item = self.listWidget.item(i)
-            friend = getUser(self.currentUser.friends[i])
-            item.setText(friend.toString())
-
-        self.listWidget.setSortingEnabled(__sortingEnabled)
+        self.updateFriendsList(len(self.currentUser.friends))
 
 
 def main():

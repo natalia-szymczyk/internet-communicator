@@ -232,6 +232,7 @@ class Ui_LoginPage(object):
         self.signInButton.setText("Sign in")
         self.passwordInputIn.setText("Password")
         self.nameInputUp.setText("Name")
+        self.signInButton.setShortcut("Return")
 
 
 def main():

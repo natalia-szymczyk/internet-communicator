@@ -75,15 +75,12 @@ class Ui_SearchFriend(object):
         foundFriend = getUser(login)
 
         if foundFriend != None:
-            print("found! " + foundFriend.toString())
-            print(self.currentUser.friends)
             if foundFriend.login in self.currentUser.friends:
                 self.errorLabel.setText("Already Your friend")
             elif foundFriend.login == self.currentUser.login:
                 self.errorLabel.setText("This is your login")
             else:
                 addFriend(self.currentUser, foundFriend)
-                # self.friendAdded = True
                 self.errorLabel.setText("Friend added")
         else:
             self.errorLabel.setText("Login not found.")

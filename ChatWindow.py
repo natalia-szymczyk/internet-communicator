@@ -7,14 +7,11 @@ class Ui_ChatWindow(object):
     def setupUi(self, ChatWindow, currentUser, friend):
         self.currentUser = currentUser
         self.friend = friend
-        self.filename = f"{self.currentUser.login}_{self.friend.login}.txt"
 
-        with open(self.filename, 'a+') as f:
-                f.write('\n')
-                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                f.write('\n')
+        logins = [self.currentUser.login, self.friend.login]
+        logins.sort()
 
-        # TODO zapisac ten plik do chatu
+        self.filename = f"{logins[0]}_{logins[1]}.txt"
 
         ChatWindow.setObjectName("ChatWindow")
         ChatWindow.resize(500, 500)
@@ -51,8 +48,23 @@ class Ui_ChatWindow(object):
         self.retranslateUi(ChatWindow)
         QtCore.QMetaObject.connectSlotsByName(ChatWindow)
 
-        # TODO zapamietywanie wiadomosci 
+        self.readFromFile()
 
+    def readFromFile(self):
+        with open(self.filename, 'a+') as f:
+                f.write('\n')
+                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                f.write('\n')
+
+        font = self.chat.font()
+        font.setPointSize(13)        
+        self.chat.setFont(font)
+        
+        with open(self.filename, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                self.chat.append(line)
+                      
 
     def send(self):
         text = self.message.text()

@@ -56,17 +56,15 @@ class User:
         
 
 def getUser(wantedLogin):
-    print(f"zaczynam szukac uzytkownika o loginie {wantedLogin}")
 
     with open(r"users.txt", "r") as f:
         for line in f:
             tmp = line.split()
             login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
             if(wantedLogin == login):
-                print(f"znaleziony {wantedLogin}")
                 return User(login, password)
 
-    print(f"nie ma uzytkownika o loginie {wantedLogin}")
+    print(f"No user with login {wantedLogin}")
     
     return None
 
@@ -76,8 +74,6 @@ def addFriend(user1, user2):
 
     user1.friends.append(login2)
     user2.friends.append(login1)
-
-    print(f"znajomi: {login1} i {login2}")
 
     with open(r"friends.txt", 'r+') as f: 
         lines = f.readlines()
