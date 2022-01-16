@@ -1,9 +1,21 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QSplitter,QVBoxLayout,QDialog, QPushButton, QApplication, QTextEdit, QLineEdit, QMessageBox, QWidget
 import sys
+from datetime import datetime
 
 class Ui_ChatWindow(object):
-    def setupUi(self, ChatWindow, user):
+    def setupUi(self, ChatWindow, currentUser, friend):
+        self.currentUser = currentUser
+        self.friend = friend
+        self.filename = f"{self.currentUser.login}_{self.friend.login}.txt"
+
+        with open(self.filename, 'a+') as f:
+                f.write('\n')
+                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                f.write('\n')
+
+        # TODO zapisac ten plik do chatu
+
         ChatWindow.setObjectName("ChatWindow")
         ChatWindow.resize(500, 500)
 
@@ -36,8 +48,10 @@ class Ui_ChatWindow(object):
 
         self.chatBody.addWidget(splitter2)
 
-        self.retranslateUi(ChatWindow, user)
+        self.retranslateUi(ChatWindow)
         QtCore.QMetaObject.connectSlotsByName(ChatWindow)
+
+        # TODO zapamietywanie wiadomosci 
 
 
     def send(self):
@@ -47,8 +61,11 @@ class Ui_ChatWindow(object):
             font = self.chat.font()
             font.setPointSize(13)        
             self.chat.setFont(font)
-            self.chat.append("login: " + text)
+            self.chat.append(f"{self.currentUser.login}: {text}")
             self.message.setText("")
+
+            with open(self.filename, 'a+') as f:
+                f.write(f"{self.currentUser.login}: {text} \n")
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Wrong input")
@@ -61,19 +78,19 @@ class Ui_ChatWindow(object):
             x = msg.exec_()
 
     
-    def retranslateUi(self, ChatWindow, user):
+    def retranslateUi(self, ChatWindow):
         _translate = QtCore.QCoreApplication.translate
-        ChatWindow.setWindowTitle(user.toString())
+        ChatWindow.setWindowTitle(self.friend.toString())
         
         self.sendButton.setShortcut("Return")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    user = "janek"
+    # user = "janek"
 
-    ChatWindow = QWidget()
-    ui = Ui_ChatWindow()
-    ui.setupUi(ChatWindow, user)
-    ChatWindow.show()
+    # ChatWindow = QWidget()
+    # ui = Ui_ChatWindow()
+    # ui.setupUi(ChatWindow, user)
+    # ChatWindow.show()
 
     sys.exit(app.exec_())

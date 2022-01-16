@@ -79,9 +79,12 @@ class Ui_SearchFriend(object):
             print(self.currentUser.friends)
             if foundFriend.login in self.currentUser.friends:
                 self.errorLabel.setText("Already Your friend")
+            elif foundFriend.login == self.currentUser.login:
+                self.errorLabel.setText("This is your login")
             else:
                 addFriend(self.currentUser, foundFriend)
                 # self.friendAdded = True
+                self.errorLabel.setText("Friend added")
         else:
             self.errorLabel.setText("Login not found.")
 
@@ -89,7 +92,7 @@ class Ui_SearchFriend(object):
         
         self.users = []
 
-        with open(r"internet-communicator\users.txt", "r") as f:
+        with open(r"users.txt", "r") as f:
             for line in f:
                 tmp = line.split()
                 login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])

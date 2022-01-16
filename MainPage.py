@@ -132,6 +132,7 @@ class Ui_MainWindow(object):
         description = self.descriptionEdit.text()
         self.currentUser.updateDescription(description)
 
+
     def openChat(self, element):
         start = '('
         end = ')'
@@ -141,16 +142,15 @@ class Ui_MainWindow(object):
         self.openChatWindow(friend)
         
 
-    def openChatWindow(self, user):
+    def openChatWindow(self, friend):
         self.window = QtWidgets.QWidget()
         self.ui = Ui_ChatWindow()
-        self.ui.setupUi(self.window, user)
+        self.ui.setupUi(self.window, self.currentUser, friend)
         self.window.show()
         self.chatWindows.append(self.window)
 
 
     def addFriend(self):
-        # TODO szukanie znajomych po loginie
         self.openSearchFriend()
 
 
@@ -264,9 +264,7 @@ class Ui_MainWindow(object):
             friend = getUser(self.currentUser.friends[i])
             item.setText(friend.toString())
 
-
         self.listWidget.setSortingEnabled(__sortingEnabled)
-
 
 
 def main():
