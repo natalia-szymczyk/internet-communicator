@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import sys
 
-from User import User
+from User import User, getUser
 from SearchFriend import Ui_SearchFriend
 from ChatWindow import Ui_ChatWindow
 
@@ -12,6 +12,7 @@ MainWindow = QtWidgets.QMainWindow()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, user):
+        self.currentUser = user
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(622, 600)
 
@@ -59,17 +60,11 @@ class Ui_MainWindow(object):
         font.setFamily("Times New Roman")
         font.setPointSize(14)
 
-        item = QtWidgets.QListWidgetItem()
-        item.setFont(font)
-        self.listWidget.addItem(item)
+        for i in range(len(user.friends)):
+            item = QtWidgets.QListWidgetItem()
+            item.setFont(font)
+            self.listWidget.addItem(item)
 
-        item = QtWidgets.QListWidgetItem()
-        item.setFont(font)
-        self.listWidget.addItem(item)
-
-        item = QtWidgets.QListWidgetItem()
-        item.setFont(font)
-        self.listWidget.addItem(item)
 
         self.yourFriendsLabel = QtWidgets.QLabel(self.centralwidget)
         self.yourFriendsLabel.setGeometry(QtCore.QRect(0, 170, 171, 41))
@@ -84,14 +79,14 @@ class Ui_MainWindow(object):
         self.yourFriendsLabel.setFont(font)
 
         self.helloLabel = QtWidgets.QLabel(self.centralwidget)
-        self.helloLabel.setGeometry(QtCore.QRect(10, 80, 131, 31))
+        self.helloLabel.setGeometry(QtCore.QRect(10, 80, 231, 31))
 
         font.setPointSize(14)
 
         self.helloLabel.setFont(font)
 
         self.descriptionEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.descriptionEdit.setGeometry(QtCore.QRect(0, 111, 621, 31))
+        self.descriptionEdit.setGeometry(QtCore.QRect(0, 111, 631, 31))
 
         font = QtGui.QFont()
         font.setFamily("Imprint MT Shadow")
@@ -99,6 +94,15 @@ class Ui_MainWindow(object):
 
         self.descriptionEdit.setFont(font)
         self.descriptionEdit.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.descriptionButton = QtWidgets.QPushButton(self.centralwidget)
+        self.descriptionButton.setGeometry(QtCore.QRect(540, 111, 81, 31))
+
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(10)
+
+        self.descriptionButton.setFont(font)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -111,7 +115,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow, user)
+        self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.listWidget.itemDoubleClicked.connect(self.openChat)
@@ -120,13 +124,21 @@ class Ui_MainWindow(object):
 
         self.logOutButton.clicked.connect(self.askBeforeLogOut)
 
+        self.descriptionButton.clicked.connect(self.changeDescription)
+
         self.chatWindows = []
 
+    def changeDescription(self):
+        description = self.descriptionEdit.text()
+        self.currentUser.updateDescription(description)
 
-    def openChat(self, friendLogin):
-        print(friendLogin.text())
-        # TODO wyskakuje okienko z chatem
-        self.openChatWindow(friendLogin.text())
+    def openChat(self, element):
+        start = '('
+        end = ')'
+        friendsString = element.text()
+        friendLogin = friendsString[friendsString.find(start)+len(start):friendsString.rfind(end)]
+        friend = getUser(friendLogin)
+        self.openChatWindow(friend)
         
 
     def openChatWindow(self, user):
@@ -138,16 +150,29 @@ class Ui_MainWindow(object):
 
 
     def addFriend(self):
-        print("add friend")
         # TODO szukanie znajomych po loginie
         self.openSearchFriend()
 
 
     def openSearchFriend(self):
+        # before = self.currentUser.friends
+        # print(f"before {before}")
+
         self.window = QtWidgets.QMainWindow()   
         self.ui = Ui_SearchFriend()
-        self.ui.setupUi(self.window)
+        self.ui.setupUi(self.window, self.currentUser)
         self.window.show()
+
+        # TODO update friends list ??
+
+        # after = self.currentUser.friends
+        # print(f"after {after}")
+
+        # print(f"bool:  {self.ui.friendAdded}")
+
+        # if before != after:
+        #     self.updateFriendsList()
+
         
 
     def askBeforeLogOut(self):
@@ -215,34 +240,38 @@ class Ui_MainWindow(object):
         return palette
 
 
-    def retranslateUi(self, MainWindow, user):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Gadu Gadu"))
         self.gaduGaduLabel.setText("Gadu Gadu")
         self.yourFriendsLabel.setText("Your friends:")
-        self.helloLabel.setText(_translate("MainWindow", f"Hello {user.name}! "))
-        self.descriptionEdit.setText(_translate("MainWindow", "My description"))
+        self.helloLabel.setText(_translate("MainWindow", f"Hello {self.currentUser.name}! "))
+        self.descriptionEdit.setText(_translate("MainWindow", self.currentUser.description))
         self.addFriendButton.setText("Add a friend")
         self.logOutButton.setText("Log out")
+        self.descriptionButton.setText("Change")
 
+        self.updateFriendsList()
+
+    def updateFriendsList(self):
         __sortingEnabled = self.listWidget.isSortingEnabled()
         self.listWidget.setSortingEnabled(False)
 
-        item = self.listWidget.item(0)
-        item.setText(_translate("MainWindow", "Osoba 1"))
+        for i in range(len(self.currentUser.friends)):
+            print(self.currentUser.friends[i])
 
-        item = self.listWidget.item(1)
-        item.setText(_translate("MainWindow", "Osoba 2"))
+            item = self.listWidget.item(i)
+            friend = getUser(self.currentUser.friends[i])
+            item.setText(friend.toString())
 
-        item = self.listWidget.item(2)
-        item.setText(_translate("MainWindow", "Osoba 3"))
 
         self.listWidget.setSortingEnabled(__sortingEnabled)
 
 
+
 def main():
 
-    user = User("login1", "password1")
+    user = User("basia", "haslo1")
 
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow, user)

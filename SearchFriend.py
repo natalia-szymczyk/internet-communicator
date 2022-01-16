@@ -1,9 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
+from User import User, getUser, addFriend
 
 
 class Ui_SearchFriend(object):
-    def setupUi(self, SearchFriend):
+    def setupUi(self, SearchFriend, user):
+        self.currentUser = user
         SearchFriend.setObjectName("SearchFriend")
         SearchFriend.resize(400, 252)
 
@@ -56,22 +58,44 @@ class Ui_SearchFriend(object):
         self.retranslateUi(SearchFriend)
         QtCore.QMetaObject.connectSlotsByName(SearchFriend)
 
+        self.getAllUsers()
+        # self.friendAdded = False
+
         self.searchButton.clicked.connect(self.searchFriend)
 
 
     def searchFriend(self):
         login = self.friendsLogin.text()
-        print("searching " + login )
 
         if len(login) < 5:
             self.errorLabel.setText("Login too short.")
-        
-        found = True 
-        # TODO szukanie znajomych
+        elif len(login) > 20:
+            self.errorLabel.setText("Login too long.")
 
-        if not found:
+        foundFriend = getUser(login)
+
+        if foundFriend != None:
+            print("found! " + foundFriend.toString())
+            print(self.currentUser.friends)
+            if foundFriend.login in self.currentUser.friends:
+                self.errorLabel.setText("Already Your friend")
+            else:
+                addFriend(self.currentUser, foundFriend)
+                # self.friendAdded = True
+        else:
             self.errorLabel.setText("Login not found.")
 
+    def getAllUsers(self):
+        
+        self.users = []
+
+        with open(r"internet-communicator\users.txt", "r") as f:
+            for line in f:
+                tmp = line.split()
+                login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
+                self.users.append([login, password, name])
+
+        self.logins = [login for [login, _, _] in self.users]
 
 
     def retranslateUi(self, SearchFriend):
@@ -87,9 +111,11 @@ class Ui_SearchFriend(object):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
+    user = User("basia", "haslo1")
+
     SearchFriend = QtWidgets.QWidget()
     ui = Ui_SearchFriend()
-    ui.setupUi(SearchFriend)
+    ui.setupUi(SearchFriend, user)
     SearchFriend.show()
 
     sys.exit(app.exec_())

@@ -63,7 +63,7 @@ class Ui_ChatWindow(object):
     
     def retranslateUi(self, ChatWindow, user):
         _translate = QtCore.QCoreApplication.translate
-        ChatWindow.setWindowTitle(user + " (jakis opis)")
+        ChatWindow.setWindowTitle(user.toString())
         
         self.sendButton.setShortcut("Return")
 

@@ -177,9 +177,14 @@ class Ui_LoginPage(object):
 
 
     def signUp(self, name, login, password):
-        s = f"\n{login} {password} {name}"
+        s1 = f"\n{login} {password} {name}"
         file = open(r"internet-communicator\users.txt", 'a')
-        file.write(s)
+        file.write(s1)
+        file.close()
+
+        s2 = f"\n{login} "
+        file = open(r"internet-communicator\friends.txt", 'a')
+        file.write(s2)
         file.close()
 
         user = User(login, password)
