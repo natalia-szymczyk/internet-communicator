@@ -2,15 +2,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import sys
 
+from User import User
 from SearchFriend import Ui_SearchFriend
-from ChatWindow import Window
+from ChatWindow import Ui_ChatWindow
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
 
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, user):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(622, 600)
 
@@ -110,7 +111,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(MainWindow, user)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.listWidget.itemDoubleClicked.connect(self.openChat)
@@ -129,9 +130,11 @@ class Ui_MainWindow(object):
         
 
     def openChatWindow(self, user):
-        window = Window(user)
-        window.exec()
-        self.chatWindows.append(window)
+        self.window = QtWidgets.QWidget()
+        self.ui = Ui_ChatWindow()
+        self.ui.setupUi(self.window, user)
+        self.window.show()
+        self.chatWindows.append(self.window)
 
 
     def addFriend(self):
@@ -163,10 +166,10 @@ class Ui_MainWindow(object):
 
     def popup_button(self, i):
         if i.text() == "&Yes":
-            self.LogOut()
+            self.logOut()
 
 
-    def LogOut(self):
+    def logOut(self):
         QtWidgets.qApp.quit()
 
 
@@ -212,12 +215,12 @@ class Ui_MainWindow(object):
         return palette
 
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, MainWindow, user):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Gadu Gadu"))
         self.gaduGaduLabel.setText("Gadu Gadu")
         self.yourFriendsLabel.setText("Your friends:")
-        self.helloLabel.setText(_translate("MainWindow", "Hello {login}! "))
+        self.helloLabel.setText(_translate("MainWindow", f"Hello {user.name}! "))
         self.descriptionEdit.setText(_translate("MainWindow", "My description"))
         self.addFriendButton.setText("Add a friend")
         self.logOutButton.setText("Log out")
@@ -239,8 +242,10 @@ class Ui_MainWindow(object):
 
 def main():
 
+    user = User("login1", "password1")
+
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui.setupUi(MainWindow, user)
     MainWindow.show()
     sys.exit(app.exec_())
 

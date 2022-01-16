@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from MainPage import Ui_MainWindow
+from User import User
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QAction
 
@@ -110,13 +111,29 @@ class Ui_LoginPage(object):
         self.statusbar.setObjectName("statusbar")
         LoginPage.setStatusBar(self.statusbar)
 
+        self.getAllUsers()
+
         self.retranslateUi(LoginPage)
         QtCore.QMetaObject.connectSlotsByName(LoginPage)
-
 
         self.signInButton.clicked.connect(self.signInCheck)
 
         self.signUpButton.clicked.connect(self.signUpCheck)
+
+
+    def getAllUsers(self):
+        
+        self.users = []
+        self.login_password = []
+
+        with open(r"internet-communicator\users.txt", "r") as f:
+            for line in f:
+                tmp = line.split()
+                login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
+                self.users.append([login, password, name])
+                self.login_password.append([login, password])
+
+        self.logins = [login for [login, _, _] in self.users]
 
 
     def loginCheck(self, login):
@@ -128,7 +145,9 @@ class Ui_LoginPage(object):
             return False
 
         available = True
-        # TODO sprawdzanie czy login zajety
+        
+        if login in self.logins:
+            available = False
 
         if available == False:
             self.errorLabel.setText("Login not available.")
@@ -149,42 +168,51 @@ class Ui_LoginPage(object):
 
 
     def signUpCheck(self):
-        print("check sign up " + " name: " + self.nameInputUp.text() + " login: " + self.loginInputUp.text() + " password: " + self.passwordInputUp.text())
-
-        if self.passwordCheck(self.passwordInputUp.text()) and self.loginCheck(self.loginInputUp.text()):
-            self.signUp()
-
-
-    def signUp(self):
-        print("Successfully registered")
-        # TODO rejstracja uzytkownika
-        self.openMainPage()
+        name = self.nameInputUp.text()
+        login = self.loginInputUp.text()
+        password = self.passwordInputUp.text()
+        
+        if self.passwordCheck(password) and self.loginCheck(login):
+            self.signUp(name, login, password)
 
 
-    def openMainPage(self):
+    def signUp(self, name, login, password):
+        s = f"\n{login} {password} {name}"
+        file = open(r"internet-communicator\users.txt", 'a')
+        file.write(s)
+        file.close()
+
+        user = User(login, password)
+        
+        self.openMainPage(user)
+
+
+    def openMainPage(self, user):
         self.window = QtWidgets.QMainWindow()   
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self.window)
+        self.ui.setupUi(self.window, user)
         self.window.show()
         LoginPage.hide()
         
 
     def signInCheck(self):
-        print("checking sign in" + " login: " + self.loginInputIn.text() + " password: " + self.passwordInputIn.text())
+        login = self.loginInputIn.text()
+        password = self.passwordInputIn.text()
 
-        correctData = True
-        # TODO sprawdzanie czy dane poprawne 
+        if [login, password] in self.login_password:
+            correctData = True 
+        else:
+            correctData = False    
 
         if correctData:
-            self.signIn()
+            user = User(login, password)
+            self.signIn(user)
         else:
             self.errorLabel.setText("Wrong data.")
 
 
-    def signIn(self):
-        print("ok to sign in")
-        # TODO logowanie
-        self.openMainPage()
+    def signIn(self, user):
+        self.openMainPage(user)
 
 
     def retranslateUi(self, LoginPage):
@@ -202,8 +230,6 @@ class Ui_LoginPage(object):
 
 
 def main():
-    # app = QtWidgets.QApplication(sys.argv)
-    # LoginPage = QtWidgets.QMainWindow()    
     ui = Ui_LoginPage()
     ui.setupUi(LoginPage)
     LoginPage.show()

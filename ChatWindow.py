@@ -1,25 +1,25 @@
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QSplitter,QVBoxLayout,QDialog, QPushButton, QApplication, QTextEdit, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QSplitter,QVBoxLayout,QDialog, QPushButton, QApplication, QTextEdit, QLineEdit, QMessageBox, QWidget
 import sys
 
+class Ui_ChatWindow(object):
+    def setupUi(self, ChatWindow, user):
+        ChatWindow.setObjectName("ChatWindow")
+        ChatWindow.resize(500, 500)
 
-class Window(QDialog):
-    def __init__(self, user):
-        super().__init__()
-
-        self.message = QLineEdit(self)
+        self.message = QLineEdit(ChatWindow)
         self.message.resize(480,100)
         self.message.move(10,350)
 
-        self.send_button = QPushButton("Send", self)
-        self.send_button.resize(480,30)
-        self.button_font = self.send_button.font()
-        self.button_font.setPointSize(15)
-        self.send_button.setFont(self.button_font)
-        self.send_button.move(10,460)
-        self.send_button.clicked.connect(self.send)
+        self.sendButton = QPushButton("Send", ChatWindow)
+        self.sendButton.resize(480,30)
+        self.font = self.sendButton.font()
+        self.font.setPointSize(15)
+        self.sendButton.setFont(self.font)
+        self.sendButton.move(10,460)
+        self.sendButton.clicked.connect(self.send)
 
-        self.chat_body = QVBoxLayout(self)
+        self.chatBody = QVBoxLayout(ChatWindow)
         splitter = QSplitter(QtCore.Qt.Vertical)
 
         self.chat = QTextEdit()
@@ -31,13 +31,14 @@ class Window(QDialog):
 
         splitter2 = QSplitter(QtCore.Qt.Vertical)
         splitter2.addWidget(splitter)
-        splitter2.addWidget(self.send_button)
+        splitter2.addWidget(self.sendButton)
         splitter2.setSizes([200,10])
 
-        self.chat_body.addWidget(splitter2)
+        self.chatBody.addWidget(splitter2)
 
-        self.setWindowTitle(user + " (jakis opis)")
-        self.resize(500, 500)
+        self.retranslateUi(ChatWindow, user)
+        QtCore.QMetaObject.connectSlotsByName(ChatWindow)
+
 
     def send(self):
         text = self.message.text()
@@ -59,10 +60,20 @@ class Window(QDialog):
 
             x = msg.exec_()
 
+    
+    def retranslateUi(self, ChatWindow, user):
+        _translate = QtCore.QCoreApplication.translate
+        ChatWindow.setWindowTitle(user + " (jakis opis)")
+        
+        self.sendButton.setShortcut("Return")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    user = "login"
-    window = Window(user)
-    window.exec()
+    user = "janek"
+
+    ChatWindow = QWidget()
+    ui = Ui_ChatWindow()
+    ui.setupUi(ChatWindow, user)
+    ChatWindow.show()
+
     sys.exit(app.exec_())

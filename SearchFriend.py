@@ -81,6 +81,8 @@ class Ui_SearchFriend(object):
         self.friendsLogin.setText("Login")
         self.label.setText("Search a friend:")
 
+        self.searchButton.setShortcut("Return")
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
