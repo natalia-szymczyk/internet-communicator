@@ -8,17 +8,21 @@
 #include <unistd.h> // for close
 #include<pthread.h>
 
+// gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
+
 char client_message[2000];
+char user_list[30][50];
+int user_number = 0;
 char buffer[1024];
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 void * socketThread(void *arg)
 {
-  printf("new thread \n");
+  printf("%d. thread \n", user_number++);
   int newSocket = *((int *)arg);
   int n;
   for(;;){
-    n=recv(newSocket , client_message , 2000 , 0);
+    n = recv(newSocket , client_message , 2000 , 0);
     printf("%s\n",client_message);
         if(n<1){
             break;
@@ -33,6 +37,7 @@ void * socketThread(void *arg)
 
     }
     printf("Exit socketThread \n");
+    user_number--;
 
     pthread_exit(NULL);
 }
@@ -59,6 +64,9 @@ int main(){
 
   //Set all bits of the padding field to 0 
   memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
+  
+  // active users
+  memset(user_list, 0, sizeof user_list);
 
   //Bind the address struct to the socket 
   bind(serverSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
