@@ -12,6 +12,7 @@ MainWindow = QtWidgets.QMainWindow()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, user):
+        # self.client_socket.send(bytes(f"dzialam w mainie","utf-8"))
         self.currentUser = user
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(622, 600)
@@ -279,10 +280,11 @@ def main():
 
     user = User("basia", "haslo1")
 
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow, user)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    # ui = Ui_MainWindow()
+    # ui.setupUi(MainWindow, user)
+
+    # MainWindow.show()
+    # sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
