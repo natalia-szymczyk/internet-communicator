@@ -4,13 +4,13 @@
 #include<netinet/in.h>
 #include<string.h>
 #include <arpa/inet.h>
-#include <fcntl.h> // for open
-#include <unistd.h> // for close
+#include <fcntl.h> 
+#include <unistd.h>
 #include<pthread.h>
 
 // gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
 
-#define PORT 8885
+#define PORT 8887
 #define MAX_CLIENTS 100
 #define MSG_SIZE 2048
 
@@ -23,7 +23,6 @@ static int uid = 10;
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-/* Client structure */
 typedef struct{
 	struct sockaddr_storage address;
 	int sockfd;
@@ -33,8 +32,19 @@ typedef struct{
 
 client_t *clients[MAX_CLIENTS];
 
+void print_users(){
+	pthread_mutex_lock(&clients_mutex);
 
-/* Send message to all clients except sender */
+	for(int i=0; i < MAX_CLIENTS; ++i){
+		if(clients[i]){
+			printf("\n %i --> %s \n", i, clients[i]->name);
+			}
+		}
+
+	pthread_mutex_unlock(&clients_mutex);
+}
+
+
 void send_message(char *s, char* name){
 	pthread_mutex_lock(&clients_mutex);
 
@@ -46,7 +56,6 @@ void send_message(char *s, char* name){
           break;
         }
       }
-			
 		}
 	}
 
@@ -77,18 +86,6 @@ void queue_remove(int uid){
 			}
 		}
 	}
-
-	pthread_mutex_unlock(&clients_mutex);
-}
-
-void print_users(){
-	pthread_mutex_lock(&clients_mutex);
-
-	for(int i=0; i < MAX_CLIENTS; ++i){
-		if(clients[i]){
-			printf("\n %i --> %s \n", i, clients[i]->name);
-			}
-		}
 
 	pthread_mutex_unlock(&clients_mutex);
 }
@@ -137,19 +134,15 @@ void * socketThread(void *arg){
       strcat(msg, token);
       strcat(msg, "++");
 
-      // send(cli->sockfd,msg,MSG_SIZE,0);
       
       printf("ALL: FROM %s TO %s IS %s ", cli->name, receiver, msg);
 
-      // send_message(msg ,cli->uid);
 
       if(strlen(client_message) > 0){
-				// send_message(client_message, receiver);
 				send_message(msg, receiver);
       }
 
 
-      // send(cli->sockfd,message,MSG_SIZE,0);
     }
     else if (strcmp(token, "LOGIN") == 0){
       token = strtok(NULL, delimiter);
@@ -167,8 +160,6 @@ void * socketThread(void *arg){
     printf("\n");
 
     sleep(1);
-    // send(newSocket,message,sizeof(message),0);
-    // memset(&client_message, 0, MSG_SIZE);
     bzero(client_message, MSG_SIZE);
 
     }
@@ -180,8 +171,6 @@ void * socketThread(void *arg){
     client_number--;
 
     pthread_exit(NULL);
-
-    // TODO segmentation fault kiedy wszystkie watki sie rozlaczaja
 }
 
 
@@ -202,7 +191,7 @@ int main(){
   serverAddr.sin_port = htons(PORT);
 
   //Set IP address to localhost 
-  serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  serverAddr.sin_addr.s_addr = inet_addr("172.27.86.40");
 
 
   //Set all bits of the padding field to 0 
