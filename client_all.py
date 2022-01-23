@@ -11,29 +11,38 @@ from datetime import datetime
 app = QtWidgets.QApplication(sys.argv)
 LoginPage = QtWidgets.QMainWindow()
 
-
 client_socket = None
 active = True
+chat_opened = False
+currentLogin = ""
 
 class ClientThread(Thread):
     def __init__(self,window): 
         Thread.__init__(self) 
         self.window = window
- 
+
     def run(self): 
-       host = "127.0.0.1"
-       port = 1100
-       BUFFER_SIZE = 2000 
-       global client_socket
-       client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        host = "127.0.0.1"
+        port = 8885
+        BUFFER_SIZE = 2000 
+        global client_socket
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
-       client_socket.connect((host, port))
+        client_socket.connect((host, port))
        
-       while True:
-            if active == False:
-                break
+        while active:   
+            data = client_socket.recv(BUFFER_SIZE).decode("unicode_escape")
+            msg = data.split("++")
+            msg = msg[1:-1]
 
-       client_socket.close() 
+            if len(msg) > 0 and len(msg[0]) > 1:
+                global ui
+                ui.chat.append(msg[0])       
+                     
+
+        client_socket.shutdown(socket.SHUT_RDWR) 
+        client_socket.close()
+        sys.exit()
 
 
 class Ui_LoginPage(object):
@@ -215,7 +224,7 @@ class Ui_LoginPage(object):
 
         user = User(login, password)
         
-        self.openMainPage(user)
+        self.signIn(user)
 
 
     def openMainPage(self, user):
@@ -243,7 +252,9 @@ class Ui_LoginPage(object):
 
 
     def signIn(self, user):
-        client_socket.send(bytes(f"LOGIN|{user.login}","utf-8"))
+        client_socket.send(bytes(f"++LOGIN++{user.login}++","utf-8"))
+        global currentLogin
+        currentLogin = user.login
         self.openMainPage(user)
 
 
@@ -266,7 +277,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow, user):
         self.currentUser = user
         global client_socket
-        client_socket.send(bytes(f"MAIN|{self.currentUser.login}","utf-8"))
+        # client_socket.send(bytes(f"MAIN+{self.currentUser.login}","utf-8"))
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(622, 600)
 
@@ -402,16 +413,18 @@ class Ui_MainWindow(object):
         friendLogin = friendsString[friendsString.find(start)+len(start):friendsString.rfind(end)]
         friend = getUser(friendLogin)
         global client_socket
-        client_socket.send(bytes(f"CHAT|{self.currentUser.login}|{friendLogin}","utf-8"))
+        client_socket.send(bytes(f"++CHAT++{self.currentUser.login}++{friendLogin}++","utf-8"))
         self.openChatWindow(friend)
         
 
     def openChatWindow(self, friend):
-        self.window = QtWidgets.QWidget()
-        self.ui = Ui_ChatWindow()
-        self.ui.setupUi(self.window, self.currentUser, friend)
-        self.window.show()
-        self.chatWindows.append(self.window)
+        global chat_opened
+        chat_opened = True
+        self.chat_window = QtWidgets.QWidget()  
+        global ui      
+        ui.setupUi(self.chat_window, self.currentUser, friend)
+        self.chat_window.show()
+        self.chatWindows.append(self.chat_window)
 
 
     def addFriend(self):
@@ -445,7 +458,7 @@ class Ui_MainWindow(object):
 
 
     def logOut(self):
-        client_socket.send(bytes(f"LOGOUT|{self.currentUser.login}","utf-8"))
+        client_socket.send(bytes(f"++LOGOUT++{self.currentUser.login}++","utf-8"))
         # client_socket.close()
         # sys.exit()
         global active
@@ -583,6 +596,7 @@ class Ui_ChatWindow(object):
 
         self.readFromFile()
 
+
     def readFromFile(self):
         with open(self.filename, 'a+') as f:
                 f.write('\n')
@@ -609,7 +623,7 @@ class Ui_ChatWindow(object):
             self.chat.append(f"{self.currentUser.login}: {text}")
             self.message.setText("")
             
-            client_socket.send(bytes(f"MSG|{self.currentUser.login}|{self.friend.login}|{text}","utf-8"))
+            client_socket.send(bytes(f"++MSG++{self.currentUser.login}++{self.friend.login}++{text}++","utf-8"))
             
 
             with open(self.filename, 'a+') as f:
@@ -711,7 +725,7 @@ class Ui_SearchFriend(object):
                 self.errorLabel.setText("This is your login")
             else:
                 addFriend(self.currentUser, foundFriend)
-                client_socket.send(bytes(f"ADD|{self.currentUser.login}|{foundFriend.login}", "utf-8"))
+                client_socket.send(bytes(f"++   ADD++{self.currentUser.login}++{foundFriend.login}++", "utf-8"))
                 self.errorLabel.setText("Friend added")
         else:
             self.errorLabel.setText("Login not found.")
@@ -740,13 +754,14 @@ class Ui_SearchFriend(object):
         self.searchButton.setShortcut("Return")
 
 
-
+ui = Ui_ChatWindow()
 
 def main():
     ui = Ui_LoginPage()
     ui.setupUi(LoginPage)
     
     clientThread=ClientThread(LoginPage)
+    clientThread.daemon = True
     clientThread.start()
     
     LoginPage.show()

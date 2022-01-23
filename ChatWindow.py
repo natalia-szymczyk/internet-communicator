@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QSplitter,QVBoxLayout,QDialog, QPushButton, QApplica
 import sys
 from datetime import datetime
 
+from User import getUser
+
+
 class Ui_ChatWindow(object):
     def setupUi(self, ChatWindow, currentUser, friend):
         self.currentUser = currentUser
@@ -96,13 +99,20 @@ class Ui_ChatWindow(object):
         
         self.sendButton.setShortcut("Return")
 
+
+app = QApplication(sys.argv)
+ChatWindow = QWidget()
+ui = Ui_ChatWindow()
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    # user = "janek"
+    user1 = getUser("basia")
+    user2 = getUser("jasia")
 
     # ChatWindow = QWidget()
     # ui = Ui_ChatWindow()
-    # ui.setupUi(ChatWindow, user)
-    # ChatWindow.show()
+    ui.setupUi(ChatWindow, user1, user2)
+    ChatWindow.show()
+
+    ui.chat.append("proba: proba")
 
     sys.exit(app.exec_())
