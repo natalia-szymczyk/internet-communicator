@@ -10,6 +10,7 @@
 
 // gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
 
+#define HOST "172.27.82.106"
 #define PORT 8858
 #define MAX_CLIENTS 100
 #define MSG_SIZE 2048
@@ -206,7 +207,7 @@ int main(){
 
   //Set IP address to localhost 
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  server_addr.sin_addr.s_addr = inet_addr("172.27.91.201");
+  server_addr.sin_addr.s_addr = inet_addr(HOST);
 
   //Set all bits of the padding field to 0 
   memset(server_addr.sin_zero, '\0', sizeof server_addr.sin_zero);
