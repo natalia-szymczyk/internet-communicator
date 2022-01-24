@@ -10,7 +10,7 @@
 
 // gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
 
-#define PORT 8828
+#define PORT 8858
 #define MAX_CLIENTS 100
 #define MSG_SIZE 2048
 
@@ -82,7 +82,8 @@ void remove_client(int uid){
 void print_users(){
 	pthread_mutex_lock(&clients_mutex);
 
-  printf("\n\nACTIVE USERS:\n");
+  printf("\n\n---------------------------------------------------");
+  printf("\nACTIVE USERS:\n");
 
 	for(int i = 0; i < MAX_CLIENTS; ++i){
 		if(clients[i]){
@@ -90,6 +91,7 @@ void print_users(){
 			}
 		}
 
+  printf("\n---------------------------------------------------\n");
 	pthread_mutex_unlock(&clients_mutex);
 }
 
@@ -178,6 +180,8 @@ void *socketThread(void *arg){
     free(client);
     client_number--;
 
+    print_users();
+
     pthread_exit(NULL);
 }
 
@@ -202,6 +206,7 @@ int main(){
 
   //Set IP address to localhost 
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  server_addr.sin_addr.s_addr = inet_addr("172.27.91.201");
 
   //Set all bits of the padding field to 0 
   memset(server_addr.sin_zero, '\0', sizeof server_addr.sin_zero);
