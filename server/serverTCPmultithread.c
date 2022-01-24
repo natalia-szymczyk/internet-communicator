@@ -12,7 +12,7 @@
 
 #define HOST "172.27.82.106"
 #define PORT 8858
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 50
 #define MSG_SIZE 2048
 
 char client_message[MSG_SIZE];
