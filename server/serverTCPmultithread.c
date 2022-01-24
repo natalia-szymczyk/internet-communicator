@@ -11,7 +11,7 @@
 // gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
 
 #define HOST "172.27.82.106"
-#define PORT 8858
+#define PORT 8898
 #define MAX_CLIENTS 50
 #define MSG_SIZE 2048
 
@@ -35,16 +35,14 @@ Client *clients[MAX_CLIENTS];
 void send_message(char *s, char* login){
 	pthread_mutex_lock(&clients_mutex);
 
-	for(int i = 0; i < MAX_CLIENTS; ++i){
-		if(clients[i]){
-			if(strcmp(clients[i]->login, login) == 0 ){
+	for(int i = 0; i < MAX_CLIENTS; ++i)
+		if(clients[i])
+			if(strcmp(clients[i]->login, login) == 0 )
         if(send(clients[i]->sockfd, s, strlen(s), 0) < 0){
           perror("ERROR: Sending failed");
           break;
-        }
-      }			
-		}
-	}
+        }    			 
+	
 
 	pthread_mutex_unlock(&clients_mutex);
 }
@@ -106,7 +104,7 @@ void *socketThread(void *arg){
   int n;
 
   while(1){
-    n = recv(client->sockfd , client_message , 2000 , 0);
+    n = recv(client->sockfd , client_message , MSG_SIZE , 0);
 
     if(n < 1){
         break;
