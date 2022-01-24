@@ -24,16 +24,16 @@ class ClientThread(Thread):
         self.window = window
 
     def run(self): 
-        host = "172.27.91.84"
-        port = 8858
-        BUFFER_SIZE = 2000 
+        host = "172.27.82.106"
+        port = 8898
+        MSG_SIZE = 2048 
         global client_socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
         client_socket.connect((host, port))
        
         while active:   
-            data = client_socket.recv(BUFFER_SIZE).decode("unicode_escape")
+            data = client_socket.recv(MSG_SIZE).decode("unicode_escape")
             msg = data.split("++")
             msg = msg[1:-1]
 
