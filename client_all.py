@@ -15,8 +15,6 @@ client_socket = None
 active = True
 chat_opened = False
 currentLogin = ""
-currentFriend = ""
-
 
 class ClientThread(Thread):
     def __init__(self,window): 
@@ -24,25 +22,18 @@ class ClientThread(Thread):
         self.window = window
 
     def run(self): 
-        host = "172.27.86.40"
-        port = 8887
+        host = "127.0.0.1"
+        port = 8828
         BUFFER_SIZE = 2000 
         global client_socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
-        try:
-            client_socket.connect((host, port))
-            print("Connection ok")
-        except:
-            print("Connection failed")
-            sys.exit()
+        client_socket.connect((host, port))
        
         while active:   
             data = client_socket.recv(BUFFER_SIZE).decode("unicode_escape")
             msg = data.split("++")
             msg = msg[1:-1]
-
-            print(f"msg: {msg}")
 
             if len(msg) > 0 and len(msg[0]) > 1:
                 global ui
@@ -429,8 +420,6 @@ class Ui_MainWindow(object):
     def openChatWindow(self, friend):
         global chat_opened
         chat_opened = True
-        global currentFriend
-        currentFriend = friend.login
         self.chat_window = QtWidgets.QWidget()  
         global ui      
         ui.setupUi(self.chat_window, self.currentUser, friend)
@@ -782,5 +771,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
