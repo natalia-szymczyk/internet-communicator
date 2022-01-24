@@ -52,13 +52,9 @@ class Ui_ChatWindow(object):
         QtCore.QMetaObject.connectSlotsByName(ChatWindow)
 
         self.readFromFile()
+        self.dateWritten = False
 
     def readFromFile(self):
-        with open(self.filename, 'a+') as f:
-                f.write('\n')
-                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                f.write('\n')
-
         font = self.chat.font()
         font.setPointSize(13)        
         self.chat.setFont(font)
@@ -67,10 +63,22 @@ class Ui_ChatWindow(object):
             lines = f.readlines()
             for line in lines:
                 self.chat.append(line)
-                      
 
+
+    def writeDate(self):
+        with open(self.filename, 'a+') as f:
+                f.write('\n')
+                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                f.write('\n')
+
+        self.dateWritten = True
+
+                      
     def send(self):
         text = self.message.text()
+
+        if not self.dateWritten:
+            self.writeDate()
 
         if len(text) > 0:
             font = self.chat.font()

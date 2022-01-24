@@ -6,6 +6,7 @@ from threading import Thread
 import socket
 import sys
 from datetime import datetime
+import os.path
 
 
 app = QtWidgets.QApplication(sys.argv)
@@ -15,6 +16,7 @@ client_socket = None
 active = True
 chat_opened = False
 currentLogin = ""
+currentFriend = ""
 
 class ClientThread(Thread):
     def __init__(self,window): 
@@ -22,8 +24,8 @@ class ClientThread(Thread):
         self.window = window
 
     def run(self): 
-        host = "127.0.0.1"
-        port = 8828
+        host = "172.27.91.201"
+        port = 8858
         BUFFER_SIZE = 2000 
         global client_socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -36,8 +38,15 @@ class ClientThread(Thread):
             msg = msg[1:-1]
 
             if len(msg) > 0 and len(msg[0]) > 1:
-                global ui
-                ui.chat.append(msg[0])       
+
+                friend = msg[0].split(":")
+                friend = friend[0]
+
+                print(f"msg: {msg}, friend: {friend}")
+
+                if friend == currentFriend:
+                    global ui
+                    ui.chat.append(msg[0])       
                      
 
         client_socket.shutdown(socket.SHUT_RDWR) 
@@ -387,7 +396,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.chatWindows = []
+        # self.chatWindows = []
         oldFriends = len(self.currentUser.friends)
 
         self.listWidget.itemDoubleClicked.connect(self.openChat)
@@ -420,11 +429,13 @@ class Ui_MainWindow(object):
     def openChatWindow(self, friend):
         global chat_opened
         chat_opened = True
+        global currentFriend
+        currentFriend = friend.login
         self.chat_window = QtWidgets.QWidget()  
         global ui      
         ui.setupUi(self.chat_window, self.currentUser, friend)
         self.chat_window.show()
-        self.chatWindows.append(self.chat_window)
+        # self.chatWindows.append(self.chat_window)
 
 
     def addFriend(self):
@@ -594,27 +605,43 @@ class Ui_ChatWindow(object):
         self.retranslateUi(ChatWindow)
         QtCore.QMetaObject.connectSlotsByName(ChatWindow)
 
+        self.dateWritten = False
         self.readFromFile()
 
 
     def readFromFile(self):
+        font = self.chat.font()
+        font.setPointSize(13)        
+        self.chat.setFont(font)
+
+        if os.path.isfile(self.filename):        
+            with open(self.filename, "rb") as f:
+                lines = f.readlines()
+                for line in lines:
+                    self.chat.append(line.decode("utf-8"))
+        else:
+            f = open(self.filename, "w+")
+
+
+    def writeDate(self):
         with open(self.filename, 'a+') as f:
                 f.write('\n')
                 f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
                 f.write('\n')
-
+        
         font = self.chat.font()
         font.setPointSize(13)        
         self.chat.setFont(font)
-        
-        with open(self.filename, "r") as f:
-            lines = f.readlines()
-            for line in lines:
-                self.chat.append(line)
-                      
+        self.chat.append(f"\n{datetime.today().strftime('%Y-%m-%d %H:%M:%S')}\n")
 
+        self.dateWritten = True
+
+                      
     def send(self):
         text = self.message.text()
+
+        if not self.dateWritten:
+            self.writeDate()
 
         if len(text) > 0:
             font = self.chat.font()
