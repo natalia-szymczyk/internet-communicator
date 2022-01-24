@@ -89,7 +89,7 @@ class Ui_SearchFriend(object):
         
         self.users = []
 
-        with open(r"users.txt", "r") as f:
+        with open(r".\info\users.txt", "r") as f:
             for line in f:
                 tmp = line.split()
                 login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
