@@ -11,7 +11,7 @@
 // gcc -g -Wall -pthread yourcode.c -lpthread -o yourprogram
 
 #define PORT 8858
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 50
 #define MSG_SIZE 2048
 
 char client_message[MSG_SIZE];
@@ -205,7 +205,7 @@ int main(){
   server_addr.sin_port = htons(PORT);
 
   //Set IP address to localhost 
-  server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  // server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   server_addr.sin_addr.s_addr = inet_addr("172.27.91.201");
 
   //Set all bits of the padding field to 0 

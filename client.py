@@ -24,7 +24,7 @@ class ClientThread(Thread):
         self.window = window
 
     def run(self): 
-        host = "172.27.91.201"
+        host = "172.27.91.84"
         port = 8858
         BUFFER_SIZE = 2000 
         global client_socket
