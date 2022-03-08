@@ -8,14 +8,14 @@ class User:
         self.name = ""
         self.friends = []
         
-        with open(r"users.txt", "r") as f:
+        with open(r".\info\users.txt", "r") as f:
             for line in f:
                 tmp = line.split()
                 login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
                 if(self.login == login):
                     self.name = name
 
-        with open(r"friends.txt", 'r') as f:
+        with open(r".\info\friends.txt", 'r') as f:
             lines = f.readlines()
             for i, line in enumerate(lines):
                 if line.startswith(self.login):
@@ -23,7 +23,7 @@ class User:
                     self.friends = friendsLogins
                     # self.friends = [self.getUser(name) for name in friendsLogins]
 
-        with open(r"descriptions.txt", 'r') as f:
+        with open(r".\info\descriptions.txt", 'r') as f:
             lines = f.readlines()
             for i, line in enumerate(lines):
                 if line.startswith(self.login):
@@ -40,14 +40,14 @@ class User:
 
         notInFile = True
         
-        with open(r"descriptions.txt", 'r') as f:
+        with open(r".\info\descriptions.txt", 'r') as f:
             lines = f.readlines()
             for i, line in enumerate(lines):
                 if line.startswith(self.login):
                     notInFile = False
                     lines[i] = f"{self.login} {description} \n"
 
-        with open(r"descriptions.txt", 'w') as f:
+        with open(r".\info\descriptions.txt", 'w') as f:
             for line in lines:
                 f.write(line)
             
@@ -57,14 +57,14 @@ class User:
 
 def getUser(wantedLogin):
 
-    with open(r"users.txt", "r") as f:
+    with open(r".\info\users.txt", "r") as f:
         for line in f:
             tmp = line.split()
             login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
             if(wantedLogin == login):
                 return User(login, password)
 
-    print(f"No user with login {wantedLogin}")
+    # print(f"No user with login {wantedLogin}")
     
     return None
 
@@ -75,7 +75,7 @@ def addFriend(user1, user2):
     user1.friends.append(login2)
     user2.friends.append(login1)
 
-    with open(r"friends.txt", 'r+') as f: 
+    with open(r".\info\friends.txt", 'r+') as f: 
         lines = f.readlines()
         for i, line in enumerate(lines):
             if line.startswith(login1):
@@ -84,7 +84,7 @@ def addFriend(user1, user2):
         for line in lines:
             f.write(line)
 
-    with open(r"friends.txt", 'r+') as f: 
+    with open(r".\info\friends.txt", 'r+') as f: 
         lines = f.readlines()
         for i, line in enumerate(lines):
             if line.startswith(login2):
