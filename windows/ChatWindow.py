@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QSplitter,QVBoxLayout,QDialog, QPushButton, QApplica
 import sys
 from datetime import datetime
 
+from User import getUser
+
+
 class Ui_ChatWindow(object):
     def setupUi(self, ChatWindow, currentUser, friend):
         self.currentUser = currentUser
@@ -49,13 +52,9 @@ class Ui_ChatWindow(object):
         QtCore.QMetaObject.connectSlotsByName(ChatWindow)
 
         self.readFromFile()
+        self.dateWritten = False
 
     def readFromFile(self):
-        with open(self.filename, 'a+') as f:
-                f.write('\n')
-                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                f.write('\n')
-
         font = self.chat.font()
         font.setPointSize(13)        
         self.chat.setFont(font)
@@ -64,10 +63,22 @@ class Ui_ChatWindow(object):
             lines = f.readlines()
             for line in lines:
                 self.chat.append(line)
-                      
 
+
+    def writeDate(self):
+        with open(self.filename, 'a+') as f:
+                f.write('\n')
+                f.write(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                f.write('\n')
+
+        self.dateWritten = True
+
+                      
     def send(self):
         text = self.message.text()
+
+        if not self.dateWritten:
+            self.writeDate()
 
         if len(text) > 0:
             font = self.chat.font()
@@ -96,13 +107,20 @@ class Ui_ChatWindow(object):
         
         self.sendButton.setShortcut("Return")
 
+
+app = QApplication(sys.argv)
+ChatWindow = QWidget()
+ui = Ui_ChatWindow()
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    # user = "janek"
+    user1 = getUser("basia")
+    user2 = getUser("jasia")
 
     # ChatWindow = QWidget()
     # ui = Ui_ChatWindow()
-    # ui.setupUi(ChatWindow, user)
-    # ChatWindow.show()
+    ui.setupUi(ChatWindow, user1, user2)
+    ChatWindow.show()
+
+    ui.chat.append("proba: proba")
 
     sys.exit(app.exec_())

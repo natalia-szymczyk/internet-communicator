@@ -126,7 +126,7 @@ class Ui_LoginPage(object):
         self.users = []
         self.login_password = []
 
-        with open(r"users.txt", "r") as f:
+        with open(r".\info\users.txt", "r") as f:
             for line in f:
                 tmp = line.split()
                 login, password, name = tmp[0], tmp[1], " ".join(tmp[2:])
@@ -178,12 +178,12 @@ class Ui_LoginPage(object):
 
     def signUp(self, name, login, password):
         s1 = f"\n{login} {password} {name}"
-        file = open(r"users.txt", 'a')
+        file = open(r".\info\users.txt", 'a')
         file.write(s1)
         file.close()
 
         s2 = f"\n{login} "
-        file = open(r"friends.txt", 'a')
+        file = open(r".\info\friends.txt", 'a')
         file.write(s2)
         file.close()
 
@@ -245,5 +245,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
